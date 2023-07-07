@@ -1,0 +1,29 @@
+{#
+macro: handleSourceReferenceNullCheck
+
+purpose: macro surrounds nested with either a source presence checker or a null check. It acts directly on the
+source reference. It adds an else clause with the default assigment when applicable.
+
+requires: caller to implement boolean:getIncludeSourceNullCheck()
+#}
+
+{% macro handleExceptions(assignment) %}
+    {% if assignment.getThrownTypes|length == 0 %}
+
+    {% else %}
+        try {
+
+        }
+        {% for thrownType in assignment.getThrownTypes %}
+            catch ( thrownType e ) {
+                throw new RuntimeException( e );
+            }
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+
+
+{% macro getReturnType(returnType) %}
+    {% if returnType %}:{% if returnType.typeMirror.allowsNull %}null|{% endif %}{% if returnType.getTypeElement.isBuiltin == false %}\{% endif %}{{ returnType.fullyQualifiedName }}{% endif %}
+{% endmacro %}

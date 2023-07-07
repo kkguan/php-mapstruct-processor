@@ -1,0 +1,62 @@
+{# @var method Kkguan\PHPMapstruct\Processor\Internal\Model\BeanMappingMethod #}
+{# 引入 method.twig 模板文件 #}
+{# 该文件对应的method对应的类是 BeanMappingMethod.php #}
+{# berforMapping,afterMapping 未实现 #}
+
+{% import "Macro/macro.twig" as macro %}
+
+{{ method.accessibility.accessibility }}{% if method.static %} static {% endif%} function {{ method.name }}({% for parameter in method.parameters %}{% if loop.first == false %},{% endif %}{{ include(parameter.getTemplate(), {parameter: parameter})}}{% endfor %}){{ macro.getReturnType(method.returnType) }}
+{{ '{' }}
+{# TODO:berforMapping, #}
+
+{% if method.returnType.typeMirror.allowsNull %}
+    if ({% for sourceParameter in method.sourceParameters %} {% if loop.index > 1 %}&&{% endif %} ${{ sourceParameter.name }}===null {% endfor %}) {
+        return null;
+    }
+{% endif %}
+
+{% if method.hasSubclassMappings %}
+    // TODO:SubclassMappings
+{% endif %}
+
+{% if method.isAbstractReturnType %}
+    throw new \IllegalArgumentException("Not all subclasses are supported for this mapping. Missing for " , method.subclassMappings[0].sourceArgument);
+{% endif %}
+
+{% if method.isExistingInstanceMapping == false %}
+    {% if method.hasConstructorMappings %}
+        {% if method.getSourceParameters|length > 1 %}
+            {# hasConstructorMappings 还未支持 #}
+        {% endif %}
+    {% else %}
+        {#        #}
+        ${{ method.getResultName() }} = new \{{ method.returnType.typeMirror.name }}();
+    {% endif %}
+{% endif %}
+
+{# beforeMappingReferencesWithMappingTarget未实现 #}
+
+{% if method.sourceParameters|length>1 %}
+    {#  这里是多个入参的时候才需要执行到的  #}
+    {% for sourceParam in method.getSourceParametersNeedingNullCheck %}
+
+        {% if method.propertyMappingsByParameter(sourceParam)|length > 0 %}
+            if (${{ sourceParam.name }} !== null) {
+                {% for propertyMapping in method.propertyMappingsByParameter(sourceParam) %}
+                    {{ include(propertyMapping.getTemplate(), {propertyMapping: propertyMapping, targetBeanName: method.getResultName, existingInstanceMapping: method.isExistingInstanceMapping, defaultValueAssignment:propertyMapping.getDefaultValueAssignment, resultName: method.getResultName() }) }}
+                {% endfor %}
+            {{ '}' }}
+        {% endif %}
+    {% endfor %}
+{% else %}
+    {#  这里只需要单个入参  #}
+    {% if  method.isMapNullToDefault %} if ({{ method.sourceParameters[0].name }} !== null) {{ '{' }} {% endif %}
+    {% for propertyMapping in method.propertyMappingsByParameter(method.sourceParameters[0]) %}
+        {{ include(propertyMapping.getTemplate(), {propertyMapping: propertyMapping, targetBeanName: method.getResultName, existingInstanceMapping: method.isExistingInstanceMapping, defaultValueAssignment:propertyMapping.getDefaultValueAssignment, resultName: method.getResultName() }) }}
+    {% endfor %}
+    {% if  method.isMapNullToDefault %} {{ '}' }} {% endif %}
+{% endif %}
+
+return ${{ method.getResultName() }};
+{# TODO:afterMapping #}
+{{ '}' }}

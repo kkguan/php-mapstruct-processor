@@ -1,0 +1,2 @@
+{% if propertie.private %}private{% endif %}{% if propertie.public %}public{% endif %}{% if propertie.protected %}protected{% endif %}{% if propertie.static %} static {% endif %} {{ propertie.type.name }} ${{ propertie.name }} {% if propertie.defaultValue %} = {% if propertie.type == 'string'  %}'{% endif %}{{ propertie.value }}{% if propertie.type == 'string'  %}'{% endif %}{% endif %};
+

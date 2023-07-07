@@ -1,0 +1,24 @@
+{# setterWrapper.twig  #}
+ {% if assignment.getThrownTypes|length == 0 %}
+
+     {% if assignment.getSourceLocalVarName != null %}
+         {{ '//TODO: getSourceLocalVarName 该功能未实现' }}
+     {% endif %}
+     {% if assignment.getSourcePresenceCheckerReference != null %}
+         {{ '//TODO: getSourcePresenceCheckerReference 该功能未实现' }}
+     {% elseif assignment.getIncludeSourceNullCheck %}
+         {{ '//TODO: getIncludeSourceNullCheck 该功能未实现' }}
+     {% else %}
+         ${{ resultName }}->{{ targetWriteAccessorName }}({{ include(assignment.getAssignment.getTemplate, {assignment: assignment.getAssignment, targetReadAccessorName: targetReadAccessorName, targetWriteAccessorName: targetWriteAccessorName, targetType: targetType, defaultValueAssignment: defaultValueAssignment}) }});
+     {% endif  %}
+ {% else %}
+    {#   理论上来讲PHP没有这个东西，后续可以支持在注释里面拿 #}
+     try {
+
+     }
+     {% for thrownType in assignment.getThrownTypes %}
+         catch ( thrownType e ) {
+            throw new RuntimeException( e );
+         }
+     {% endfor %}
+ {% endif %}

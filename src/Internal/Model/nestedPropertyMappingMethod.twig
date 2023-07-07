@@ -1,0 +1,33 @@
+{# @var NestedPropertyMappingMethod Kkguan\PHPMapstruct\Processor\Internal\Model\NestedPropertyMappingMethod #}
+
+{% import "Macro/macro.twig" as macro %}
+
+{{ method.accessibility.accessibility }}{% if method.static %} static {% endif %} function {{ method.name }}({% for parameter in method.parameters %}{% if loop.first == false %},{% endif %}{{ include(parameter.getTemplate(), {parameter: parameter})}}{% endfor %}){{ macro.getReturnType(method.returnType) }}
+{{ '{' }}
+
+
+{% for entry in method.propertyEntries %}
+
+    {% if entry.presenceChecker %}
+        if ( {% if loop.first %} ${{entry.previousPropertyName }} == null {% else %} || ${{ entry.previousPropertyName }} == null {% endif%} ) {
+            return null;
+        }
+    {% endif %}
+
+    ${{ entry.name }} = ${{ entry.previousPropertyName }}->{{ entry.accessorName }};
+
+    {% if entry.presenceChecker != false  %}
+        {% if entry.type.primitive != false %}
+            if ( {{ entry.name }} == null ) {
+                return null;
+            }
+        {% endif %}
+    {% endif %}
+
+    {% if loop.last %}
+        return ${{ entry.name }};
+    {% endif %}
+
+{% endfor %}
+{{ '}' }}
+

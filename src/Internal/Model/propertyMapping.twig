@@ -1,0 +1,6 @@
+{# @var propertyMapping \Kkguan\PHPMapstruct\Processor\Internal\Model\Common\Parameter #}
+{% if propertyMapping.getAssignment != null %}
+{{ include(propertyMapping.getAssignment.getTemplate(), {assignment: propertyMapping.getAssignment, targetReadAccessorName: propertyMapping.targetReadAccessorName, targetWriteAccessorName: propertyMapping.targetWriteAccessorName, targetType: propertyMapping.targetType, defaultValueAssignment: propertyMapping.defaultValueAssignment}) }}
+{% else %}
+    throw new \Kkguan\PHPMapstruct\Processor\Exception\IllegalArgumentException("No mapping found for target property `{{ propertyMapping.getName }}`.");
+{% endif %}

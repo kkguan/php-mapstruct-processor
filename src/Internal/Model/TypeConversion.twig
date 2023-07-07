@@ -1,0 +1,4 @@
+
+{{ assignment.getOpenExpression }}
+{{ include(assignment.getAssignment.getTemplate(), {assignment: assignment.getAssignment(), targetReadAccessorName: targetReadAccessorName, targetWriteAccessorName: targetWriteAccessorName, targetType: targetType, defaultValueAssignment: defaultValueAssignment}) }}
+{{ assignment.getCloseExpression }}

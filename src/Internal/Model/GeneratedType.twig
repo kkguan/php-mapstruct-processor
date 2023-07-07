@@ -1,0 +1,24 @@
+{{ '<?php' }}
+{% if namespace|length > 0 %}
+namespace {{namespace}};
+
+{% endif %}
+
+use {{ namespace }};
+
+/**
+ * date: {{ "now"|date("Y-m-d H:i:s") }}
+ **/
+ // TODO: 注解还未收集，暂不支持
+class {{ className }}Impl {% if builder.typeElement.interface %}implements{% else %}extends{% endif %} {{ className }} {{ '{' }}
+
+{% for propertie in builder.typeElement.properties %}
+    {% include('field.twig') %}
+{% endfor %}
+
+{% for method in builder.methods %}
+{# 根据Mapping获取模板 #}
+{{ include(method.template, {method: method}) }}
+{% endfor %}
+
+{{ '}' }}
